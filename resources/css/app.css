@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/* Tell Tailwind to scan Laravel's hidden vendor views for classes */
+@source "../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php";
+@source "../../storage/framework/views/*.php";
+
+/* You can write nested CSS natively just like you used to in SCSS! */
+@theme {
+  --color-primary: #3490dc;
+}
+
+.custom-container {
+    background-color: var(--color-primary);
+    
+    h1 {
+        font-weight: bold;
+        color: white;
+    }
+}

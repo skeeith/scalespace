@@ -1,0 +1,37 @@
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "devDependencies": {
+        "@babel/plugin-transform-optional-chaining": "^8.0.5",
+        "@laravel/echo-vue": "^2.5.0",
+        "@popperjs/core": "^2.11.8",
+        "@tailwindcss/vite": "^4.3.3",
+        "@vitejs/plugin-vue": "^6.0.9",
+        "axios": "^1.20.0",
+        "chart.js": "^4.5.1",
+        "chokidar": "^5.0.0",
+        "concurrently": "^10.0.5",
+        "cross-env": "^10.1.0",
+        "laravel-echo": "^2.5.0",
+        "laravel-vite-plugin": "^3.2.0",
+        "lodash": "^4.18.1",
+        "luxon": "^3.7.2",
+        "mitt": "^3.0.1",
+        "pinia": "^4.0.3",
+        "pusher-js": "^8.6.0",
+        "tailwindcss": "^4.3.3",
+        "vite": "^8.3.2",
+        "vite-plugin-dynamic-import": "^1.6.0",
+        "vite-plugin-manifest-sri": "^0.2.0",
+        "vue": "^3.5.43",
+        "vue-router": "^5.3.1"
+    },
+    "optionalDependencies": {
+        "@laravel/multiplex": "^0.4.1"
+    }
+}

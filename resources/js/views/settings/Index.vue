@@ -1,0 +1,58 @@
+<template>
+    <div class="contianer">
+        <div class="card">
+            <ul class="nav nav-pills nav-justified">
+                <li class="nav-item bg-white">
+                    <router-link class="nav-link p-3" :to="{ name: 'corporations.index' }">
+                        Corporations
+                    </router-link>
+                </li>
+                <li class="nav-item bg-white">
+                    <router-link class="nav-link p-3" :to="{ name: 'contact-types.index' }">
+                        Contact Types
+                    </router-link>
+                </li>
+                <li class="nav-item bg-white">
+                    <router-link class="nav-link p-3 " :to="{ name: 'brands.index' }">
+                        Brands
+                    </router-link>
+                </li>
+                <li class="nav-item bg-white">
+                    <router-link class="nav-link p-3 " :to="{ name: 'item-types.index' }">
+                        Item Types
+                    </router-link>
+                </li>
+                <li class="nav-item bg-white">
+                    <router-link class="nav-link p-3 " :to="{ name: 'item-classifications.index' }">
+                        Item Classifications
+                    </router-link>
+                </li>
+                <li class="nav-item bg-white">
+                    <router-link class="nav-link p-3" :to="{ name: 'unit-of-measurements.index' }">
+                        Unit of Measurement
+                    </router-link>
+                </li>
+                <li class="nav-item bg-white">
+                    <router-link class="nav-link p-3" :to="{ name: 'users.index' }">
+                        Users
+                    </router-link>
+                </li>
+                <li class="nav-item bg-white">
+                    <router-link class="nav-link p-3" :to="{ name: 'user-roles.index' }">
+                        User Roles
+                    </router-link>
+                </li>
+            </ul>
+        </div>
+
+        <br>
+
+        <div class="row">
+            <div class="col-md-12">
+                <transition name="fade" mode="out-in">
+                    <router-view></router-view>
+                </transition>
+            </div>
+        </div>
+    </div>
+</template>
