@@ -64,11 +64,11 @@
 </script>
 
 <template>
-    <header class="sticky top-0 z-30 box-border h-[80px] border-b border-slate-200 bg-white/95 backdrop-blur-xl transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950/95">
-        <div class="flex h-full w-full items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
-            <div class="flex min-w-0 flex-1 items-center gap-3">
-                <button type="button" class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition transition-transform duration-300 ease-out hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 lg:flex dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-700 dark:hover:bg-blue-950/40 dark:hover:text-blue-400" :class="desktopSidebarOpen ? '' : 'ml-5'" :aria-expanded="desktopSidebarOpen" :aria-label="desktopSidebarOpen ? 'Close sidebar' : 'Open sidebar'" :title="desktopSidebarOpen ? 'Close sidebar' : 'Open sidebar'" @click="emit('toggle-desktop-sidebar')">
-                    <svg class="h-5 w-5 transition-transform duration-300 ease-out" :class="desktopSidebarOpen ? 'rotate-0' : 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+    <header class="sticky top-0 z-30 box-border min-h-[80px] border-b border-slate-200 bg-white/95 backdrop-blur-xl transition-colors duration-300 dark:border-slate-800 dark:bg-slate-950/95">
+        <div class="flex min-h-[80px] w-full flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-2 sm:flex-nowrap sm:gap-4 sm:px-6 sm:py-0 lg:px-8">
+            <div class="flex min-w-0 flex-1 flex-wrap items-center gap-3 sm:flex-nowrap">
+                <button type="button" class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-600 shadow-sm transition-[margin,transform,background-color,border-color,color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] hover:border-blue-300 hover:bg-blue-50 hover:text-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 lg:flex dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-blue-700 dark:hover:bg-blue-950/40 dark:hover:text-blue-400" :class="desktopSidebarOpen ? '' : 'ml-5'" :aria-expanded="desktopSidebarOpen" :aria-label="desktopSidebarOpen ? 'Close sidebar' : 'Open sidebar'" :title="desktopSidebarOpen ? 'Close sidebar' : 'Open sidebar'" @click="emit('toggle-desktop-sidebar')">
+                    <svg class="h-5 w-5 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]" :class="desktopSidebarOpen ? 'rotate-0' : 'rotate-180'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 </button>
@@ -79,7 +79,7 @@
                     </svg>
                 </button>
 
-                <div class="flex min-w-0 items-center gap-3 overflow-hidden transition-all duration-300 ease-out" :class="isDesktop && desktopSidebarOpen ? 'pointer-events-none max-w-0 -translate-x-3 opacity-0' : 'max-w-[360px] translate-x-0 opacity-100'">
+                <div class="flex min-w-0 items-center gap-3 overflow-hidden transition-[max-width,transform,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]" :class="isDesktop && desktopSidebarOpen ? 'pointer-events-none max-w-0 -translate-x-3 opacity-0' : 'max-w-[360px] translate-x-0 opacity-100'">
                     <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-cyan-400 text-white shadow-lg shadow-blue-500/20">
                         <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                             <path d="M5 5h5v5H5zM14 5h5v5h-5zM5 14h5v5H5zM14 14h5v5h-5z" fill="currentColor" />
@@ -98,8 +98,8 @@
 
                 <div class="hidden h-8 w-px shrink-0 bg-slate-200 sm:block dark:bg-slate-800"></div>
 
-                <nav class="flex min-w-0 items-center gap-2 text-lg lg:flex" aria-label="Breadcrumb">
-                    <a href="#" class="hidden shrink-0 text-slate-400 transition hover:text-blue-600 sm:block dark:text-slate-500 dark:hover:text-blue-400">
+                <nav class="order-last flex min-w-0 basis-full items-center gap-2 pt-1 text-base sm:order-none sm:basis-auto sm:pt-0 sm:text-lg" aria-label="Breadcrumb">
+                    <a href="#" class="shrink-0 text-slate-400 transition hover:text-blue-600 dark:text-slate-500 dark:hover:text-blue-400">
                         Management
                     </a>
 
@@ -107,7 +107,7 @@
                         <path d="m9 18 6-6-6-6" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
 
-                    <span class="truncate font-medium text-slate-700 dark:text-slate-300">
+                    <span class="min-w-0 break-words font-medium text-slate-700 dark:text-slate-300">
                         Users
                     </span>
                 </nav>

@@ -2,7 +2,8 @@
     import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
     import Sidebar from '@/views/layouts/Sidebar.vue'
     import Navbar from '@/views/layouts/Navbar.vue'
-    import Users from '@/views/Users.vue'
+    // import Users from '@/views/Users.vue'
+    import Index from '@/components/new/Index.vue';
 
     const DESKTOP_BREAKPOINT = 1024
 
@@ -141,7 +142,7 @@
             <Navbar :desktop-sidebar-open="desktopSidebarOpen" :mobile-sidebar-open="mobileSidebarOpen" :theme="theme" :is-desktop="isDesktop" @toggle-desktop-sidebar="toggleDesktopSidebar" @toggle-mobile-sidebar="toggleMobileSidebar" @toggle-theme="toggleTheme" @logout="handleLogout" />
 
             <main class="w-full">
-                <Users />
+                <Index />
             </main>
         </div>
     </div>
