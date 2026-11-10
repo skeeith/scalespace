@@ -1,11 +1,13 @@
 <script setup>
-const props = defineProps({
-    column: { type: Object, required: true },
-    sortKey: { type: String, required: true },
-    sortDirection: { type: String, required: true }
-})
-const emit = defineEmits(['sort'])
-const activateSort = () => emit('sort', props.column.key)
+    const props = defineProps({
+        column: { type: Object, required: true },
+        sortKey: { type: String, required: true },
+        sortDirection: { type: String, required: true }
+    });
+
+    const emit = defineEmits(['sort']);
+
+    const activateSort = () => emit('sort', props.column.key);
 </script>
 
 <template>

@@ -66,7 +66,7 @@
         },
 
         created() {
-            this.requiredPermissionsForUpdate = ['full-access-and-permssions', 'update-' + this.$parent.routePrefixName];
+            this.requiredPermissionsForUpdate = ['full-access-and-permissions', 'update-' + this.$parent.routePrefixName];
 
             if (this.overrideRequiredPermissionsForUpdate.length > 0) {
                 this.requiredPermissionsForUpdate = this.overrideRequiredPermissionsForUpdate;

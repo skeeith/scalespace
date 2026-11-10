@@ -1,7 +1,16 @@
+<script setup>
+    defineProps({
+        pluralName: {
+            type: String,
+            required: true
+        }
+    });
+</script>
+
 <template>
     <div class="hidden overflow-x-auto lg:block">
         <table class="w-full min-w-[1900px] text-left">
-            <caption class="sr-only">Users list with contact details, roles, and row actions</caption>
+            <caption class="sr-only">List of {{ pluralName }}</caption>
             <thead class="border-b border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:group-hover:bg-slate-900/70">
                 <slot name="thead" />
             </thead>

@@ -89,7 +89,7 @@
 
                 userPermissions: [],
                 showAssignPermissionsForRolesPermission: true,
-                requiredPermissionsForAssignPermissionsForRolesPermission: ['full-access-and-permssions', 'assign-permissions-for-roles'],
+                requiredPermissionsForAssignPermissionsForRolesPermission: ['full-access-and-permissions', 'assign-permissions-for-roles'],
                 checkForPermissions: true,
 
                 permissions:         null,

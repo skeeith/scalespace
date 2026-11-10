@@ -85,7 +85,7 @@
 
                 userPermissions: [],
                 showAssignRolesForUsersPermission: true,
-                requiredPermissionsForAssignRolesForUsers: ['full-access-and-permssions', 'assign-roles-users'],
+                requiredPermissionsForAssignRolesForUsers: ['full-access-and-permissions', 'assign-roles-users'],
                 checkForPermissions: true,
 
                 name:          null,

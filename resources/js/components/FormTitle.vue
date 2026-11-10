@@ -123,7 +123,7 @@
                 ignoreFields: ['order_by', 'order_by_field_name','page','per_page', 'with_trashed', 'only_trashed', 'is_strict'],
                 userPermissions: [],
                 showCreatePermission: true,
-                requiredPermissionsForCreate: ['full-access-and-permssions', 'create-' + this.routePrefixName],
+                requiredPermissionsForCreate: ['full-access-and-permissions', 'create-' + this.routePrefixName],
             };
         },
 

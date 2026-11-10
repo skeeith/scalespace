@@ -36,7 +36,7 @@
             console.log('this.$parent.routePrefixName', this.$parent.routePrefixName);
             return {
                 userPermissions: [],
-                requiredPermissionsForView: ['full-access-and-permssions', 'view-' + this.$parent.routePrefixName],
+                requiredPermissionsForView: ['full-access-and-permissions', 'view-' + this.$parent.routePrefixName],
             }
         },
 

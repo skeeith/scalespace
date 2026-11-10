@@ -166,11 +166,11 @@
         },
 
         created() {
-            this.requiredPermissionsForView = ['full-access-and-permssions', 'view-' + this.$parent.routePrefixName];
-            this.requiredPermissionsForUpdate = ['full-access-and-permssions', 'update-' + this.$parent.routePrefixName];
-            this.requiredPermissionsForDelete = ['full-access-and-permssions', 'delete-' + this.$parent.routePrefixName];
-            this.requiredPermissionsForRestore = ['full-access-and-permssions', 'restore-' + this.$parent.routePrefixName];
-            this.requiredPermissionsForForceDelete = ['full-access-and-permssions', 'force-delete-' + this.$parent.routePrefixName];
+            this.requiredPermissionsForView = ['full-access-and-permissions', 'view-' + this.$parent.routePrefixName];
+            this.requiredPermissionsForUpdate = ['full-access-and-permissions', 'update-' + this.$parent.routePrefixName];
+            this.requiredPermissionsForDelete = ['full-access-and-permissions', 'delete-' + this.$parent.routePrefixName];
+            this.requiredPermissionsForRestore = ['full-access-and-permissions', 'restore-' + this.$parent.routePrefixName];
+            this.requiredPermissionsForForceDelete = ['full-access-and-permissions', 'force-delete-' + this.$parent.routePrefixName];
 
             if (this.overrideRequiredPermissionsForView.length > 0) {
                 this.requiredPermissionsForView = this.overrideRequiredPermissionsForView;

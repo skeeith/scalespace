@@ -138,7 +138,7 @@
                     </div>
                 </div>
 
-                <DataTable>
+                <DataTable :pluralName="pluralName">
                     <template #thead>
                         <tr>
                             <DataTableHeader v-for="column in columns" :key="column.key" :column="column" :sort-key="sortKey" :sort-direction="sortDirection" @sort="sortBy" />

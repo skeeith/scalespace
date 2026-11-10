@@ -25,7 +25,7 @@ export default {
     },
 
     created() {
-        this.requiredPermissionsForView = ['full-access-and-permssions', 'view-' + this.$data.routePrefixName];
+        this.requiredPermissionsForView = ['full-access-and-permissions', 'view-' + this.$data.routePrefixName];
 
         if (this.overrideRequiredPermissionsForView.length > 0) {
             this.requiredPermissionsForView = this.overrideRequiredPermissionsForView;

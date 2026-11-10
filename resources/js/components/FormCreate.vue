@@ -80,7 +80,7 @@
         },
 
         created() {
-            this.requiredPermissionsForCreate = ['full-access-and-permssions', 'create-' + this.$parent.routePrefixName];
+            this.requiredPermissionsForCreate = ['full-access-and-permissions', 'create-' + this.$parent.routePrefixName];
 
             if (this.overrideRequiredPermissionsForCreate.length > 0) {
                 this.requiredPermissionsForCreate = this.overrideRequiredPermissionsForCreate;

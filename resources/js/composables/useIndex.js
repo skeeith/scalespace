@@ -3,25 +3,26 @@ import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 import { DateTime } from 'luxon';
 
-export function useIndexSetup(props) {
+export function index(props) {
     const router = useRouter();
     const route = useRoute();
 
-    // Reactive data
     const userPermissions = ref([]);
     const requiredPermissionsForView = ref([]);
     const redirectTo = ref(null);
 
-    const routePrefixName = ref('');
-    const showProgress = ref(false);
-    const data = ref(null);
     const apiPath = ref('');
-    const fieldNames = ref({});
+    const routePrefixName = ref('');
     const routeName = ref('');
+    
+    const data = ref({});
+    const fieldNames = ref({});
+
     const order_by = ref('');
     const order_by_field_name = ref('');
 
-    // Normalize permissions (supports Array and String)
+    const showProgress = ref(false);
+
     const normalizePermissions = (permissions) => {
         if (Array.isArray(permissions)) {
             return permissions;
@@ -30,33 +31,23 @@ export function useIndexSetup(props) {
         return permissions ? [permissions] : [];
     };
 
-    // Event handler
     const handleUserRetrieved = () => {
-        userPermissions.value = JSON.parse(
-            localStorage.getItem('permissions')
-        ) || [];
+        userPermissions.value = JSON.parse(localStorage.getItem('permissions')) || [];
     };
 
-    // Lifecycle: beforeMount
     onBeforeMount(() => {
         requiredPermissionsForView.value = [
             'full-access-and-permissions',
             'view-' + routePrefixName.value
         ];
 
-        // Override default permissions
-        const overridePermissions = normalizePermissions(
-            props.overrideRequiredPermissionsForView
-        );
+        const overridePermissions = normalizePermissions(props.overrideRequiredPermissionsForView);
 
         if (overridePermissions.length > 0) {
             requiredPermissionsForView.value = [...overridePermissions];
         }
 
-        // Append additional permissions
-        const additionalPermissions = normalizePermissions(
-            props.additionalRequiredPermissionsForView
-        );
+        const additionalPermissions = normalizePermissions(props.additionalRequiredPermissionsForView);
 
         if (additionalPermissions.length > 0) {
             requiredPermissionsForView.value = [
@@ -65,10 +56,8 @@ export function useIndexSetup(props) {
             ];
         }
 
-        // Listen for user permissions
         Broadcast.$on('User-Retrieved', handleUserRetrieved);
 
-        // Load existing permissions
         const permissions = localStorage.getItem('permissions');
 
         if (permissions !== null) {
@@ -76,16 +65,13 @@ export function useIndexSetup(props) {
         }
     });
 
-    // Lifecycle: mounted
     onMounted(() => {
         redirectTo.value = route.query.redirect_to;
 
         if (props.checkForPermissions) {
-            const hasPermission = requiredPermissionsForView.value.some(
-                permission => userPermissions.value.includes(permission)
-            );
+            const hasPermission = requiredPermissionsForView.value.some(permission => userPermissions.value.includes(permission));
 
-            if (!hasPermission) {
+            if (! hasPermission) {
                 router.push({ name: 'overview' });
             }
         }
@@ -144,13 +130,9 @@ export function useIndexSetup(props) {
             typeof contact?.company_name === 'string'
         ) {
             return true;
-            // return contact.company_name +
-            //     ' <span class="badge text-white bg-purple">Company</span>';
         }
 
         return false;
-        // return contact.name +
-        //     ' <span class="badge text-white bg-teal">Person</span>';
     };
 
     const convertDate = (value) => {
@@ -193,7 +175,7 @@ export function useIndexSetup(props) {
         getData,
         getParameters,
         clearParameters,
-        formatContact,
+        hasCompany,
         convertDate,
         convertYearOnly,
         convertDateNoYear,

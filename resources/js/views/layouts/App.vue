@@ -1,25 +1,25 @@
 <script setup>
-    import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-    import Sidebar from '@/views/layouts/Sidebar.vue'
-    import Navbar from '@/views/layouts/Navbar.vue'
+    import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+    import Sidebar from '@/views/layouts/Sidebar.vue';
+    import Navbar from '@/views/layouts/Navbar.vue';
     // import Users from '@/views/Users.vue'
-    import Index from '@/components/new/Index.vue';
+    import Index from '@/views/users-new/Index.vue';
 
-    const DESKTOP_BREAKPOINT = 1024
+    const DESKTOP_BREAKPOINT = 1024;
 
-    const theme = ref('dark')
-    const desktopSidebarOpen = ref(true)
-    const mobileSidebarOpen = ref(false)
-    const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : DESKTOP_BREAKPOINT)
+    const theme = ref('dark');
+    const desktopSidebarOpen = ref(true);
+    const mobileSidebarOpen = ref(false);
+    const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : DESKTOP_BREAKPOINT);
 
-    const isDesktop = computed(() => windowWidth.value >= DESKTOP_BREAKPOINT)
+    const isDesktop = computed(() => windowWidth.value >= DESKTOP_BREAKPOINT);
 
     function updateWindowWidth() {
-        windowWidth.value = window.innerWidth
+        windowWidth.value = window.innerWidth;
 
         if (isDesktop.value) {
-            mobileSidebarOpen.value = false
-            document.body.classList.remove('overflow-hidden')
+            mobileSidebarOpen.value = false;
+            document.body.classList.remove('overflow-hidden');
         }
     }
 
@@ -27,26 +27,26 @@
         theme.value = value
 
         if (value === 'dark') {
-            document.documentElement.classList.add('dark')
-            document.documentElement.style.colorScheme = 'dark'
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
         } else {
-            document.documentElement.classList.remove('dark')
-            document.documentElement.style.colorScheme = 'light'
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
         }
 
-        localStorage.setItem('scalespace-theme', value)
+        localStorage.setItem('scalespace-theme', value);
     }
 
     function toggleTheme() {
-        setTheme(theme.value === 'dark' ? 'light' : 'dark')
+        setTheme(theme.value === 'dark' ? 'light' : 'dark');
     }
 
     function toggleDesktopSidebar() {
-        if (!isDesktop.value) {
-            return
+        if (! isDesktop.value) {
+            return;
         }
 
-        desktopSidebarOpen.value = !desktopSidebarOpen.value
+        desktopSidebarOpen.value = ! desktopSidebarOpen.value;
     }
 
     function openMobileSidebar() {
@@ -142,7 +142,11 @@
             <Navbar :desktop-sidebar-open="desktopSidebarOpen" :mobile-sidebar-open="mobileSidebarOpen" :theme="theme" :is-desktop="isDesktop" @toggle-desktop-sidebar="toggleDesktopSidebar" @toggle-mobile-sidebar="toggleMobileSidebar" @toggle-theme="toggleTheme" @logout="handleLogout" />
 
             <main class="w-full">
-                <Index />
+                <router-view v-slot="{ Component }">
+                    <transition name="fade" mode="out-in">
+                        <component :is="Component"/>
+                    </transition>
+                </router-view>
             </main>
         </div>
     </div>

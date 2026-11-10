@@ -32,6 +32,7 @@ return new class extends Migration {
             $table->string('latest_logged_in_platform_used')->nullable();
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

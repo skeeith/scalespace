@@ -1,59 +1,63 @@
 <script setup>
-    import { ref, watch, onBeforeMount, onMounted } from 'vue';
+    import { ref, watch, computed, onBeforeMount, onMounted } from 'vue';
     import { onBeforeRouteUpdate, useRoute } from 'vue-router';
-    import { useIndex } from '@/composables/useIndex';
+    import { index } from '@/composables/useIndex';
 
-    const index = useIndex({
+    import Header from '@/components/new/Header.vue';
+    import DataTable from '@/components/new/DataTable.vue';
+    import DataTableHeader from '@/components/new/DataTableHeader.vue';
+    import DataTableRow from '@/components/new/DataTableRow.vue';
+    import Pagination from '@/components/new/Pagination.vue';
+
+    const composableUseIndex = index({
         overrideRequiredPermissionsForView: [],
         additionalRequiredPermissionsForView: [],
-        checkForPermissions: true
+        checkForPermissions: false
     });
 
     const {
+        apiPath,
+        routeName,
+        routePrefixName,
         data,
+        fieldNames,
         showProgress,
         userPermissions,
         getData,
         getParameters,
         clearParameters,
-        formatContact,
+        hasCompany,
         convertDate,
         convertYearOnly,
         convertDateNoYear,
         convertDateTime
-    } = index;
+    } = composableUseIndex;
+
+    apiPath.value = '/api/users';
+    routeName.value = 'users.index';
+    routePrefixName.value = 'users';
 
     const route = useRoute();
 
-    const action = ref('View');
-    const singularName = ref('User');
-    const pluralName = ref('Users');
-    const title = ref('Users');
-    const apiPath = index.apiPath;
-    const routeName = index.routeName;
-    const routePrefixName = index.routePrefixName;
+    const action        = ref('View');
+    const singularName  = ref('User');
+    const pluralName    = ref('Users');
+    const title         = ref('Users');
     const dataAttribute = ref('users');
 
-    const showAssignRolesForUsersPermission = ref(true);
+    const checkForCustomPermissions = ref(false);
+    const showAssignRolesForUsersPermission = ref(false);
 
     const requiredPermissionsForAssignRolesForUsers = [
         'full-access-and-permissions',
         'assign-roles-users'
     ];
 
-    const checkForCustomPermissions = ref(true);
-
-    const fieldNames = index.fieldNames;
-
     fieldNames.value = {
         name_from_userable_from: null,
         email: null,
         name: null
     };
-
-    apiPath.value = '/api/users';
-    routeName.value = 'users.index';
-    routePrefixName.value = 'users';
 
     const fetchData = (query, perPage) => {
         getData({
@@ -83,18 +87,14 @@
     });
 
     watch(data, (newData) => {
-        if (!newData?.users) {
+        if (! newData?.users) {
             return;
         }
 
-        const authenticatedUser = JSON.parse(
-            localStorage.getItem('user') || 'null'
-        );
+        const authenticatedUser = JSON.parse(localStorage.getItem('user') || 'null');
 
         if (Number(authenticatedUser?.id) !== 1) {
-            newData.users = newData.users.filter(
-                user => user.name !== 'Super Administrator'
-            );
+            newData[dataAttribute.value] = newData[dataAttribute.value].filter(user => user.name !== 'Super Administrator');
         }
 
         const userableFrom = {
@@ -102,28 +102,26 @@
             'App\\Models\\Warehouse': 'Warehouse'
         };
 
-        newData.users.forEach(user => {
+        newData[dataAttribute.value].forEach(user => {
             if (
                 typeof user.userable_from_type === 'string' &&
                 typeof user.userable_from_id === 'number' &&
                 userableFrom[user.userable_from_type]
             ) {
-                user.userable_from_type =
-                userableFrom[user.userable_from_type];
+                user.userable_from_type = userableFrom[user.userable_from_type];
             }
         });
     });
 
+    const hasData = computed(() => 
+        data.value && Object.keys(data.value).length > 0
+    );
+
     onBeforeMount(() => {
         if (checkForCustomPermissions.value) {
-            const requiredPermissions =
-            Array.isArray(requiredPermissionsForAssignRolesForUsers)
-            ? requiredPermissionsForAssignRolesForUsers
-            : [requiredPermissionsForAssignRolesForUsers];
+            const requiredPermissions = (Array.isArray(requiredPermissionsForAssignRolesForUsers)) ? requiredPermissionsForAssignRolesForUsers : [requiredPermissionsForAssignRolesForUsers];
 
-            const hasPermission = requiredPermissions.some(
-                permission => userPermissions.value.includes(permission)
-            );
+            const hasPermission = requiredPermissions.some(permission => userPermissions.value.includes(permission));
 
             if (! hasPermission) {
                 showAssignRolesForUsersPermission.value = false;
@@ -135,7 +133,7 @@
 <template>
     <main class="w-full px-4 py-5 sm:px-6 sm:py-6 lg:px-7 lg:py-7">
         <div class="mx-auto w-full max-w-[1800px] space-y-5 lg:space-y-6">
-            <Header :total-users="users.length" />
+            <Header v-if="hasData" :pluralName="pluralName" :totalCount="data?.meta.total ?? 0" />
 
             <section class="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
                 <div class="border-b border-slate-200 p-4 dark:border-slate-800 sm:p-5">
@@ -152,7 +150,7 @@
                     </div>
                     <div class="mt-3 flex flex-col gap-3 text-xs text-slate-500 dark:text-slate-400 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
                         <div class="flex flex-wrap items-center gap-2">
-                            <span>Showing <strong class="font-semibold text-slate-700 dark:text-slate-200">{{ rangeStart }}–{{ rangeEnd }}</strong> of <strong class="font-semibold text-slate-700 dark:text-slate-200">{{ sortedUsers.length }}</strong> users</span>
+                            <span>Showing <strong class="font-semibold text-slate-700 dark:text-slate-200">{{ rangeStart }}–{{ rangeEnd }}</strong> of <strong class="font-semibold text-slate-700 dark:text-slate-200">{{ data[dataAttribute.value].length }}</strong> users</span>
                             <span class="hidden h-4 w-px bg-slate-200 dark:bg-slate-700 sm:block" aria-hidden="true"></span>
                             <span class="inline-flex w-fit max-w-full items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50/80 px-2.5 py-1.5 font-medium text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-300"><svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path v-if="sortDirection === 'asc'" d="M12 18V6M7.5 10.5 12 6l4.5 4.5" stroke-linecap="round" stroke-linejoin="round" /><path v-else d="M12 6v12M7.5 13.5 12 18l4.5-4.5" stroke-linecap="round" stroke-linejoin="round" /></svg><span>Sorted by</span><strong class="font-bold">{{ sortedByLabel }}</strong><span class="text-blue-400 dark:text-blue-500">·</span><strong class="font-bold">{{ sortedByDirectionLabel }}</strong></span>
                         </div>
@@ -160,17 +158,19 @@
                     </div>
                 </div>
 
-                <DataTable>
+                <DataTable :pluralName="pluralName">
                     <template #thead>
                         <tr>
                             <DataTableHeader v-for="column in columns" :key="column.key" :column="column" :sort-key="sortKey" :sort-direction="sortDirection" @sort="sortBy" />
                             <th scope="col" class="sticky right-0 z-30 whitespace-nowrap bg-slate-50 px-5 py-3.5 text-right text-xs font-bold uppercase tracking-wider text-slate-600 shadow-[-6px_0_10px_-8px_rgba(15,23,42,0.35)] dark:bg-slate-950 dark:group-hover:bg-slate-900 dark:text-slate-300 dark:shadow-[-6px_0_10px_-8px_rgba(0,0,0,0.7)]">Options</th>
                         </tr>
                     </template>
+
                     <template #tbody>
                         <DataTableRow v-for="user in visibleUsers" :key="user.id" :user="user" :initials="initials" />
                         <tr v-if="!visibleUsers.length"><td colspan="12" class="px-5 py-14 text-center"><p class="text-sm font-semibold text-slate-700 dark:text-slate-200">No users found</p><p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Try changing your search or trash filter.</p></td></tr>
                     </template>
+
                     <template #mobile>
                         <article v-for="user in visibleUsers" :key="user.id" class="p-4 sm:p-5" :class="user.deleted ? 'opacity-60' : ''">
                             <div class="flex items-start gap-3"><span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-cyan-500 text-xs font-bold text-white">{{ initials(user.name) }}</span><div class="min-w-0 flex-1"><div class="flex flex-wrap items-center gap-2"><h3 class="truncate text-sm font-bold text-slate-900 dark:text-white">{{ user.name }}</h3><span v-if="user.deleted" class="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold uppercase text-red-600 dark:bg-red-950/40 dark:text-red-400">Trashed</span></div><p class="mt-1 truncate text-xs text-slate-500 dark:text-slate-400">{{ user.email }}</p></div></div>
@@ -187,10 +187,13 @@
                             </dl>
                             <div class="mt-3 grid grid-cols-2 gap-2"><button type="button" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800 touch-manipulation"><svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z" /><circle cx="12" cy="12" r="2.5" /></svg>View</button><button type="button" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-700 touch-manipulation"><svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4L16.5 3.5Z" stroke-linecap="round" stroke-linejoin="round" /></svg>Edit</button></div>
                         </article>
-                        <div v-if="!visibleUsers.length" class="px-4 py-14 text-center"><p class="text-sm font-semibold text-slate-700 dark:text-slate-200">No users found</p><p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Try changing your search or trash filter.</p></div>
+
+                        <div v-if="! visibleUsers.length" class="px-4 py-14 text-center"><p class="text-sm font-semibold text-slate-700 dark:text-slate-200">No users found</p><p class="mt-1 text-xs text-slate-500 dark:text-slate-400">Try changing your search or trash filter.</p></div>
                     </template>
                 </DataTable>
+
                 <Pagination :current-page="currentPage" :per-page="perPage" :total-pages="totalPages" :page-numbers="pageNumbers" :range-start="rangeStart" :range-end="rangeEnd" @update:per-page="perPage = $event; resetPage()" @go-to-page="goToPage" />
+
             </section>
         </div>
     </main>

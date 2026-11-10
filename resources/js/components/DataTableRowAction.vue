@@ -66,9 +66,9 @@
             return {
                 userPermissions: [],
                 showViewPermission: true,
-                requiredPermissionsForView: ['full-access-and-permssions', 'view-' + this.$parent.$parent.routePrefixName],
+                requiredPermissionsForView: ['full-access-and-permissions', 'view-' + this.$parent.$parent.routePrefixName],
                 showUpdatePermission: true,
-                requiredPermissionsForUpdate: ['full-access-and-permssions', 'update-' + this.$parent.$parent.routePrefixName],
+                requiredPermissionsForUpdate: ['full-access-and-permissions', 'update-' + this.$parent.$parent.routePrefixName],
             };
         },
 
