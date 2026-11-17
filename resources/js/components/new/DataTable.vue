@@ -1,10 +1,7 @@
 <script setup>
-    defineProps({
-        pluralName: {
-            type: String,
-            required: true
-        }
-    });
+    import { inject } from 'vue';
+
+    const pluralName = inject('pluralName');
 </script>
 
 <template>

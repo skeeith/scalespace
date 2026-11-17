@@ -33,9 +33,9 @@ const Dashboard = () => import('@/views/Dashboard.vue');
  * 
  */
 const UsersIndex       = () => import('@/views/users-new/Index.vue');
-// const UsersCreate      = () => import('@/views/users/Create.vue');
-// const UsersView        = () => import('@/views/users/View.vue');
-// const UsersEdit        = () => import('@/views/users/Edit.vue');
+const UsersCreate      = () => import('@/views/users/Create.vue');
+const UsersView        = () => import('@/views/users/View.vue');
+const UsersEdit        = () => import('@/views/users/Edit.vue');
 // const UsersAssignRoles = () => import('@/views/users/AssignRoles.vue');
 
 const router = createRouter({
@@ -60,9 +60,9 @@ const router = createRouter({
 
         // Users
         { path: '/users', name: 'users.index', component: UsersIndex },
-        // { path: '/users/create', name: 'users.create', component: UsersCreate },
-        // { path: '/users/:id', name: 'users.view', component: UsersView },
-        // { path: '/users/:id/edit', name: 'users.edit', component: UsersEdit },
+        { path: '/users/create', name: 'users.create', component: UsersCreate },
+        { path: '/users/:id', name: 'users.view', component: UsersView },
+        { path: '/users/:id/edit', name: 'users.edit', component: UsersEdit },
         // { path: '/users/:id/assign-roles', name: 'users.assign-roles', component: UsersAssignRoles },
     ],
     scrollBehavior(to, from, savedPosition) {

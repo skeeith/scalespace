@@ -41,7 +41,7 @@
         { key: 'gender', label: 'Gender' },
         { key: 'branch', label: 'Branch' },
         { key: 'roles', label: 'Multiple Roles' }
-    ]
+    ];
 
     const sortColumns = Object.fromEntries(columns.map((column) => [column.key, column.label]))
     const sortedByLabel = computed(() => sortColumns[sortKey.value] || 'Name')

@@ -1,55 +1,170 @@
 <script setup>
+    import { ref, watch, toRaw, inject } from 'vue';
+    import { useRouter, useRoute } from 'vue-router';
+    import _ from 'lodash';
+
     const props = defineProps({
-        search: {
-            type: String,
-            default: ''
-        },
-        includeTrash: {
+        showRightSide: {
             type: Boolean,
-            default: false
+            required: false,
+            default: true
         },
-        trashOnly: {
+        showCreateNew: {
             type: Boolean,
-            default: false
+            required: false,
+            default: true
         },
-        rangeStart: {
-            type: Number,
-            default: 0
+        additionalIgnoreFields: {
+            type: Array,
+            required: false,
+            default: []
         },
-        rangeEnd: {
-            type: Number,
-            default: 0
+        overrideRequiredPermissionsForCreate: {
+            type: [Array, String],
+            required: false,
+            default: []
         },
-        totalUsers: {
-            type: Number,
-            default: 0
+        checkForPermissions: {
+            type: Boolean,
+            required: false,
+            default: true
         },
-        sortDirection: {
-            type: String,
-            default: 'asc'
-        },
-        sortedByLabel: {
-            type: String,
-            default: 'Name'
-        },
-        sortedByDirectionLabel: {
-            type: String,
-            default: 'Ascending'
-        }
     });
 
-    const emit = defineEmits([
-        'update:search',
-        'reset-page',
-        'toggle-trash-only',
-        'toggle-include-trash',
-        'clear-search',
-        'show-active-only'
-    ]);
+    const routeName       = inject('routeName');
+    const routePrefixName = inject('routePrefixName');
+    const title           = inject('title');
+    const columnNames     = inject('columnNames');
+    const fieldNames      = inject('fieldNames');
+    const data            = inject('data');
+    const dataAttribute   = inject('dataAttribute');
 
-    const updateSearch = (event) => {
-        emit('update:search', event.target.value);
-        emit('reset-page');
+    const router = useRouter();
+    const route = useRoute();
+
+    const showClearSearchButton        = ref(false);
+    const searchAllField               = ref(null);
+    const ignoreFields                 = ref(['order_by', 'order_by_field_name','page','per_page', 'with_trashed', 'only_trashed', 'is_strict']);
+    const userPermissions              = ref([]);
+    const showCreatePermission         = ref(true);
+    const requiredPermissionsForCreate = ref(['full-access-and-permissions', 'create-' + routePrefixName.value]);
+
+    watch(data, (newData) => {
+        if (newData[dataAttribute.value].length == 0) {
+            return;
+        }
+
+        // console.log('FormTitle Data', data?.value.meta);
+    });
+
+    watch(
+        () => route.query, (newQuery) => {
+            showClearSearchButton.value = false;
+
+            let queryParams = {};
+
+            for (const [key, value] of Object.entries(newQuery)) {
+                if (value !== null && typeof value !== 'object') {
+                    queryParams[key] = value;
+                }
+            }
+
+            for (const key of ignoreFields.value) {
+                delete queryParams[key];
+            }
+
+            for (const val of Object.values(queryParams)) {
+                if (val !== "") {
+                    showClearSearchButton.value = true;
+                    break;
+                }
+            }
+        },
+        { /*immediate: true,*/ deep: true }
+    );
+
+    const clearSearch = () => {
+        // this.$parent.$refs.searchModal.clearParameters();
+
+        // this.searchAllField = '';
+
+        // this.$parent.$refs.searchModal.search();
+    }
+
+    const searchWithTrashed = (value) => {
+        for (const [key, value] of Object.entries(fieldNames.value)) {
+            if (! ignoreFields.value.includes(key)) {
+                fieldNames.value[key] = searchAllField.value;
+            }
+        }
+
+        // this.$parent.showProgress = true;
+
+        fieldNames.value.with_trashed = value == true ? false : true;
+        fieldNames.value.only_trashed = false;
+
+        router.push({
+            name: routeName.value,
+            query: {
+                page: 1,
+                per_page: data?.value.meta?.per_page,
+                order_by: route.query.order_by,
+                order_by_field_name: route.query.order_by_field_name,
+                is_strict: route.query.is_strict,
+                ...fieldNames.value
+            }
+        });
+    }
+
+    const searchOnlyTrashed = (value) => {
+        for (const [key, value] of Object.entries(fieldNames.value)) {
+            if (! ignoreFields.value.includes(key)) {
+                fieldNames.value[key] = searchAllField.value;
+            }
+        }
+
+        // this.$parent.showProgress = true;
+        
+        fieldNames.value.with_trashed = false;
+        fieldNames.value.only_trashed = value == true ? false : true;
+
+        router.push({
+            name: routeName.value,
+            query: {
+                page: 1,
+                per_page: data?.value.meta?.per_page,
+                order_by: route.query.order_by,
+                order_by_field_name: route.query.order_by_field_name,
+                is_strict: route.query.is_strict,
+                ...fieldNames.value
+            }
+        });
+    }
+
+    const search = _.debounce((fieldNames) => {
+        router.push({
+            name: routeName.value,
+            query: {
+                page: 1,
+                per_page: 15,
+                order_by: route.query.order_by,
+                order_by_field_name: route.query.order_by_field_name,
+                with_trashed: route.query.with_trashed,
+                only_trashed: route.query.only_trashed,
+                is_strict: route.query.is_strict,
+                ...fieldNames
+            }
+        });
+    }, 250);
+
+    const onSearch = () => {
+        for (const [key] of Object.entries(fieldNames.value)) {
+            if (! ignoreFields.value.includes(key)) {
+                fieldNames.value[key] = searchAllField.value;
+            }
+        }
+
+        search(fieldNames.value);
     };
 </script>
 
@@ -72,13 +187,13 @@
                         <path d="M13.1 2 7.2 13h4.3L10.6 22 16.8 11h-4.3L13.1 2Z" fill="url(#searchLightningGradient)" />
                     </svg>
                 </span>
-                <input :value="search" @input="updateSearch" type="search" placeholder="Search users by name, email, phone, location, branch, or role..." class="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:group-hover:bg-slate-900 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-blue-500 dark:focus:bg-slate-950" aria-label="Search users" />
+                <input v-model="searchAllField" @keyup="onSearch()" type="search" placeholder="Search Users" class="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 dark:border-slate-700 dark:bg-slate-950 dark:group-hover:bg-slate-900 dark:text-white dark:placeholder:text-slate-500 dark:focus:border-blue-500 dark:focus:bg-slate-950" aria-label="Search users" />
             </div>
 
             <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-                <button type="button" @click="emit('toggle-trash-only')" :class="trashOnly ? 'border-red-500 bg-red-500 text-white dark:border-red-600 dark:bg-red-600 dark:text-white' : 'border-slate-200 bg-white text-slate-700 hover:border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-red-900 dark:hover:bg-red-950/30 dark:hover:text-red-300'" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-blue-500/10 touch-manipulation" >
+                <button type="button" @click.prevent="searchWithTrashed(route.query.only_trashed)" :class="route.query.only_trashed ? 'border-red-500 bg-red-500 text-white dark:border-red-600 dark:bg-red-600 dark:text-white' : 'border-slate-200 bg-white text-slate-700 hover:border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-red-900 dark:hover:bg-red-950/30 dark:hover:text-red-300'" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-blue-500/10 touch-manipulation" >
                     <span class="relative inline-flex h-5 w-5 shrink-0">
-                        <svg :class="trashOnly ? 'absolute left-0 top-1 h-4.5 w-4.5 text-white dark:text-white' : 'absolute left-0 top-1 h-4.5 w-4.5 text-red-500 dark:text-red-400'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <svg :class="route.query.only_trashed ? 'absolute left-0 top-1 h-4.5 w-4.5 text-white dark:text-white' : 'absolute left-0 top-1 h-4.5 w-4.5 text-red-500 dark:text-red-400'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7M5 7h14M7 7l.7 12.2a1.5 1.5 0 0 0 1.5 1.3h5.6a1.5 1.5 0 0 0 1.5-1.3L17 7" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                         <svg class="absolute left-2.5 top-0 h-3 w-3 text-slate-500 dark:text-slate-400" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -88,9 +203,9 @@
                     Trash Items Only
                 </button>
 
-                <button type="button" @click="emit('toggle-include-trash')" :class="includeTrash && !trashOnly ? 'border-red-200 bg-red-200 text-red-800 dark:border-red-800 dark:bg-red-900/40 dark:text-red-200' : 'border-slate-200 bg-white text-slate-700 hover:border-red-400 hover:bg-red-50 hover:text-red-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-red-700 dark:hover:bg-red-950/30 dark:hover:text-red-300'" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-blue-500/10 touch-manipulation" >
+                <button type="button" @click="searchWithTrashed(route.query.with_trashed)" :class="route.query.with_trashed && ! route.query.only_trashed ? 'border-red-200 bg-red-200 text-red-800 dark:border-red-800 dark:bg-red-900/40 dark:text-red-200' : 'border-slate-200 bg-white text-slate-700 hover:border-red-400 hover:bg-red-50 hover:text-red-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-red-700 dark:hover:bg-red-950/30 dark:hover:text-red-300'" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-blue-500/10 touch-manipulation" >
                     <span class="relative inline-flex h-5 w-5 shrink-0">
-                        <svg :class="includeTrash && !trashOnly ? 'absolute left-0 top-1 h-4.5 w-4.5 text-red-700 dark:text-red-300' : 'absolute left-0 top-1 h-4.5 w-4.5 text-red-500 dark:text-red-400'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <svg :class="route.query.with_trashed && ! route.query.only_trashed ? 'absolute left-0 top-1 h-4.5 w-4.5 text-red-700 dark:text-red-300' : 'absolute left-0 top-1 h-4.5 w-4.5 text-red-500 dark:text-red-400'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7M5 7h14M7 7l.7 12.2a1.5 1.5 0 0 0 1.5 1.3h5.6a1.5 1.5 0 0 0 1.5-1.3L17 7" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
                         <svg class="absolute left-2.5 top-0 h-3 w-3 text-slate-500 dark:text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
@@ -109,7 +224,7 @@
             </div>
         </div>
 
-        <div class="mt-3 flex flex-col gap-3 text-xs text-slate-500 dark:text-slate-400 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <!-- <div class="mt-3 flex flex-col gap-3 text-xs text-slate-500 dark:text-slate-400 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <div class="flex flex-wrap items-center gap-2">
                 <span>
                     Showing
@@ -134,6 +249,6 @@
             <button v-if="includeTrash || trashOnly" type="button" @click="emit('show-active-only')" class="w-fit font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 touch-manipulation" >
                 Show active users only
             </button>
-        </div>
+        </div> -->
     </div>
 </template>

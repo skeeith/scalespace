@@ -85,11 +85,17 @@ abstract class Repository
             $query = $this->model->with($autoLoadRelationships)->filter($request)->orderBy($orderByFieldName, $orderBy);
         }
 
-        if ($request->with_trashed == 1 && ($request->only_trashed == 0 || ! isset($request->only_trashed))) {
+        if (
+            ($request->filled('with_trashed') && $request->boolean('with_trashed'))
+            && (! $request->filled('only_trashed') || ! $request->boolean('only_trashed'))
+        ) {
             $query = $query->withTrashed();
         }
 
-        if ($request->only_trashed == 1 && ($request->with_trashed == 0 || ! isset($request->with_trashed))) {
+        if (
+            ($request->filled('only_trashed') && $request->boolean('only_trashed'))
+            && (! $request->filled('with_trashed') || ! $request->boolean('with_trashed'))
+        ) {
             $query = $query->onlyTrashed();
         }
 

@@ -78,9 +78,9 @@ export function index(props) {
     });
 
     // Cleanup event listener
-    onBeforeUnmount(() => {
-        Broadcast.$off('User-Retrieved', handleUserRetrieved);
-    });
+    // onBeforeUnmount(() => {
+    //     Broadcast.$off('User-Retrieved', handleUserRetrieved);
+    // });
 
     // Methods
     const getData = (params, dataAttribute) => {
@@ -102,10 +102,6 @@ export function index(props) {
             .finally(() => {
                 showProgress.value = false;
             });
-    };
-
-    const getParameters = () => {
-        return fieldNames.value;
     };
 
     const clearParameters = () => {
@@ -173,7 +169,6 @@ export function index(props) {
         order_by_field_name,
 
         getData,
-        getParameters,
         clearParameters,
         hasCompany,
         convertDate,
