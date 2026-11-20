@@ -1,5 +1,5 @@
 <script setup>
-    import { ref, watch, toRaw, inject } from 'vue';
+    import { computed, ref, watch, toRaw, inject } from 'vue';
     import { useRouter, useRoute } from 'vue-router';
     import _ from 'lodash';
 
@@ -49,17 +49,27 @@
     const showCreatePermission         = ref(true);
     const requiredPermissionsForCreate = ref(['full-access-and-permissions', 'create-' + routePrefixName.value]);
 
+    const rangeStart = ref(0);
+    const rangeEnd = ref(0);
+
+    const sortedByLabel = ref('id');
+    const sortedByDirectionLabel = ref('Newest');
+
     watch(data, (newData) => {
         if (newData[dataAttribute.value].length == 0) {
             return;
         }
 
-        // console.log('FormTitle Data', data?.value.meta);
+        rangeStart.value = computed(() => (data?.value[dataAttribute.value].length > 0) ? ((route.query?.page ?? 1) - 1) * (route.query?.per_page ?? 15) + 1 : 0);
+        rangeEnd.value = computed(() => Math.min((route.query?.page ?? 1) * (route.query?.per_page ?? 15), data?.value[dataAttribute.value].length));
     });
 
     watch(
         () => route.query, (newQuery) => {
             showClearSearchButton.value = false;
+
+            sortedByLabel.value = newQuery.order_by_field_name ?? 'id';
+            sortedByDirectionLabel.value = (newQuery.order_by === 'asc') ? 'Oldest' : 'Newest';
 
             let queryParams = {};
 
@@ -191,7 +201,7 @@
             </div>
 
             <div class="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-                <button type="button" @click.prevent="searchWithTrashed(route.query.only_trashed)" :class="route.query.only_trashed ? 'border-red-500 bg-red-500 text-white dark:border-red-600 dark:bg-red-600 dark:text-white' : 'border-slate-200 bg-white text-slate-700 hover:border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-red-900 dark:hover:bg-red-950/30 dark:hover:text-red-300'" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-blue-500/10 touch-manipulation" >
+                <button type="button" @click.prevent="searchOnlyTrashed(route.query.only_trashed)" :class="route.query.only_trashed ? 'border-red-500 bg-red-500 text-white dark:border-red-600 dark:bg-red-600 dark:text-white' : 'border-slate-200 bg-white text-slate-700 hover:border-red-200 hover:bg-red-50 hover:text-red-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-red-900 dark:hover:bg-red-950/30 dark:hover:text-red-300'" class="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-3 text-sm font-semibold transition focus:outline-none focus:ring-4 focus:ring-blue-500/10 touch-manipulation" >
                     <span class="relative inline-flex h-5 w-5 shrink-0">
                         <svg :class="route.query.only_trashed ? 'absolute left-0 top-1 h-4.5 w-4.5 text-white dark:text-white' : 'absolute left-0 top-1 h-4.5 w-4.5 text-red-500 dark:text-red-400'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                             <path d="M8 7V5.5A1.5 1.5 0 0 1 9.5 4h5A1.5 1.5 0 0 1 16 5.5V7M5 7h14M7 7l.7 12.2a1.5 1.5 0 0 0 1.5 1.3h5.6a1.5 1.5 0 0 0 1.5-1.3L17 7" stroke-linecap="round" stroke-linejoin="round" />
@@ -224,19 +234,19 @@
             </div>
         </div>
 
-        <!-- <div class="mt-3 flex flex-col gap-3 text-xs text-slate-500 dark:text-slate-400 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div class="mt-3 flex flex-col gap-3 text-xs text-slate-500 dark:text-slate-400 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
             <div class="flex flex-wrap items-center gap-2">
                 <span>
                     Showing
                     <strong class="font-semibold text-slate-700 dark:text-slate-200">{{ rangeStart }}–{{ rangeEnd }}</strong>
                     of
-                    <strong class="font-semibold text-slate-700 dark:text-slate-200">{{ totalUsers }}</strong>
-                    users
+                    <strong class="font-semibold text-slate-700 dark:text-slate-200">{{ data?.meta?.total ?? 0 }}</strong>
+                    {{ dataAttribute }}
                 </span>
                 <span class="hidden h-4 w-px bg-slate-200 dark:bg-slate-700 sm:block" aria-hidden="true"></span>
                 <span class="inline-flex w-fit max-w-full items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50/80 px-2.5 py-1.5 font-medium text-blue-700 dark:border-blue-900/60 dark:bg-blue-950/40 dark:text-blue-300">
                     <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                        <path v-if="sortDirection === 'asc'" d="M12 18V6M7.5 10.5 12 6l4.5 4.5" stroke-linecap="round" stroke-linejoin="round" />
+                        <path v-if="route.query?.order_by === 'asc'" d="M12 18V6M7.5 10.5 12 6l4.5 4.5" stroke-linecap="round" stroke-linejoin="round" />
                         <path v-else d="M12 6v12M7.5 13.5 12 18l4.5-4.5" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                     <span>Sorted by</span>
@@ -249,6 +259,6 @@
             <button v-if="includeTrash || trashOnly" type="button" @click="emit('show-active-only')" class="w-fit font-semibold text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 touch-manipulation" >
                 Show active users only
             </button>
-        </div> -->
+        </div>
     </div>
 </template>

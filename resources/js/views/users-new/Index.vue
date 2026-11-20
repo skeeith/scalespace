@@ -113,9 +113,9 @@
 
         const authenticatedUser = JSON.parse(localStorage.getItem('user') || 'null');
 
-        if (Number(authenticatedUser?.id) !== 1) {
-            newData[dataAttribute.value] = newData[dataAttribute.value].filter(user => user.name !== 'Super Administrator');
-        }
+        // if (Number(authenticatedUser?.id) !== 1) {
+        //     newData[dataAttribute.value] = newData[dataAttribute.value].filter(user => user.name !== 'Super Administrator');
+        // }
 
         // const userableFrom = {
         //     'App\\Models\\Branch': 'Branch',
